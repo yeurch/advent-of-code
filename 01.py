@@ -1,4 +1,4 @@
-with open('01a-input.txt', 'r') as f:
+with open('01-input.txt', 'r') as f:
     items = [int(i) for i in f.read().splitlines()]
 
 items.sort()
