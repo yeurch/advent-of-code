@@ -1,36 +1,12 @@
+import itertools
+
 with open('01-input.txt', 'r') as f:
     items = [int(i) for i in f.read().splitlines()]
 
-items.sort()
+result = [(a, b) for [a, b] in itertools.combinations(items, 2) if a + b == 2020]
+(a, b) = result[0]
+print(f'{a} * {b} = {a * b}')
 
-done = False
-for i in range(len(items)-1):
-    for j in range(i+1, len(items)):
-        sum = items[i] + items[j]
-
-        if sum == 2020:
-            print(f'{items[i]} * {items[j]} = {items[i] * items[j]}')
-            done = True
-            break
-        elif sum > 2020:
-            break
-    if done:
-        break
-
-done = False
-for i in range(len(items)-2):
-    for j in range(i+1, len(items)-1):
-        for k in range(j+1, len(items)):
-            sum = items[i] + items[j] + items[k]
-
-            if sum == 2020:
-                print(f'{items[i]} * {items[j]} * {items[k]} = {items[i] * items[j] * items[k]}')
-                done = True
-                break
-            elif sum > 2020:
-                break
-        if done:
-            break
-    if done:
-        break
-
+result = [(a, b, c) for [a, b, c] in itertools.combinations(items, 3) if a + b + c == 2020]
+(a, b, c) = result[0]
+print(f'{a} * {b} * {c} = {a * b * c}')
