@@ -24,7 +24,7 @@ def main():
     results.append(my_seat[0])
 
     for i,s in enumerate(results):
-        print(f'{i}: {s}')
+        print(f'{i+1}: {s}')
 
 if __name__ == '__main__':
     main()
