@@ -22,10 +22,7 @@ def main():
     # Part 2
     for i in range(len(items)):
         q = items[i:]
-        sum = 0
-        min = -1
-        max = 0
-        ok = False
+        sum, min, max, ok = 0, -1, 0, False
         for x in q:
             sum += x
             min = x if x < min or min == -1 else min
