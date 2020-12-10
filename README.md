@@ -15,6 +15,6 @@ do come back and take a look when you've solved them, and feel free to
 
 ### License
 
-My solutions are licenses under the [MIT license](./LICENSE).
+My solutions are licensed under the [MIT license](./LICENSE).
 
 Advent of Code itself is copyright [@ericwastl](https://twitter.com/ericwastl).
