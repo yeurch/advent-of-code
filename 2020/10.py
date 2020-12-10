@@ -20,17 +20,16 @@ def main():
         items = sorted([int(i.strip()) for i in f.read().splitlines()])
 
     # Part 1
-    last = 0
+    last = 0 # Voltage of charger
     deltas = {1: 0, 2: 0, 3: 0}
     for item in items:
         deltas[item - last] += 1
         last = item
-    deltas[3] += 1
+    deltas[3] += 1 # Last adapter to device
     results.append(deltas[1] * deltas[3])
 
     # Part 2
-    combinations = 0
-    items.insert(0, 0)
+    items.insert(0, 0) # Add the charger, but not device as we know its delta is 3
     results.append(combinations_from(items))
 
     for i,s in enumerate(results):
