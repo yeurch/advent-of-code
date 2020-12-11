@@ -48,16 +48,12 @@ def do_generation(seats, min_threshold, width, height):
 
 def run_simulation(seats, min_threshold, width, height):
     state_str = ''.join([s[0] for s in seats])
-    generation = 1
     while True:
         old_state_str = state_str
         do_generation(seats, min_threshold, width, height)
         state_str = ''.join([s[0] for s in seats])
         if state_str == old_state_str:
             break
-        generation += 1
-        if generation % 100 == 0:
-            print(f'Generation {generation}')
     return len([1 for s in seats if s[0] == '#'])
 
 def main():
