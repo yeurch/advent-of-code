@@ -11,8 +11,12 @@ def combinations_from(items):
         return 1
 
     split = len(items) // 2
-    items_except_split = items[:split] + items[split+1:]
-    return combinations_from(items[:split + 1]) * combinations_from(items[split:]) + combinations_from(items_except_split)
+
+    if_skipped = 0
+    if items[split+1] - items[split-1] <= 3:
+        items_except_split = items[:split] + items[split+1:]
+        if_skipped = combinations_from(items_except_split)
+    return combinations_from(items[:split + 1]) * combinations_from(items[split:]) + if_skipped
 
 def main():
     results = []
