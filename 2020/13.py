@@ -43,7 +43,6 @@ def main():
             if (a*i[1] - offset) % j[1] != 0:
                 product = tuple([z[1] for z in requirements[:x]])
                 a += multiply_values(product) // i[1]
-                #a += 1
                 break
             if x > best:
                 print(f'Candidate multiple of {a}*{i[1]} matches up to element {x}')
