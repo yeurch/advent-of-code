@@ -15,7 +15,6 @@ def part_1(steps):
         elif cmd == 'F':
             x_pos += step[1] * vectors[heading][0]
             y_pos += step[1] * vectors[heading][1]
-        else: raise Exception(f'Unexpected command: {cmd}')
     return abs(x_pos) + abs(y_pos)
 
 def part_2(steps):
@@ -40,8 +39,6 @@ def part_2(steps):
                 temp = waypoint_y
                 waypoint_y = 0 - waypoint_x
                 waypoint_x = temp
-        else: raise Exception(f'Unexpected command: {cmd}')
-        #print(f'ship=(); waypoint=()')
     return abs(x_pos) + abs(y_pos)
 
 def main():
