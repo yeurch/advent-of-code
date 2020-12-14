@@ -1,15 +1,7 @@
-from collections import *
-from functools import lru_cache, reduce
-import heapq
-import itertools
-import math
-import random
-import sys
 import re
 import time
-from typing import Pattern, List
 
-set_regex: Pattern = re.compile(r'mem\[(\d+)\] = (\d+)')
+set_regex = re.compile(r'mem\[(\d+)\] = (\d+)')
 
 def binToDec(b):
     result, i = 0, 0
@@ -20,17 +12,28 @@ def binToDec(b):
         i += 1
     return result
 
-def part_1(program: List[str]):
-    mask = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+def execute_prog(program, part):
     memory = dict()
     for instruction in program:
         set_match = set_regex.match(instruction)
-        if set_match:
+        if not set_match:
+            mask = instruction[7:]
+        elif part == 1:
             addr = set_match.group(1)
             value = bin(int(set_match.group(2)))[2:].zfill(36)
             memory[addr] = ''.join([value[i] if mask[i] == 'X' else mask[i] for i in range(36)])
-        else:
-            mask = instruction[7:]
+        else: # part 2
+            addr = bin(int(set_match.group(1)))[2:].zfill(36)
+            value = bin(int(set_match.group(2)))[2:].zfill(36)
+            addresses_stack = [''.join([addr[i] if mask[i] == '0' else mask[i] for i in range(36)])]
+            if len(addresses_stack) != 1: raise Exception("boom")
+            while len(addresses_stack) > 0:
+                a = addresses_stack.pop()
+                if not 'X' in a:
+                    memory[a] = value
+                else:
+                    addresses_stack.append(a.replace('X', '0', 1))
+                    addresses_stack.append(a.replace('X', '1', 1))
     return sum([binToDec(v) for _,(k,v) in enumerate(memory.items())])
 
 def main():
@@ -39,8 +42,8 @@ def main():
     with open('14-input.txt', 'r') as f:
         items = [i.strip() for i in f.read().splitlines()]
 
-    # Part 1
-    results.append(part_1(items))
+    results.append(execute_prog(items, 1))
+    results.append(execute_prog(items, 2))
 
     for i,s in enumerate(results):
         print(f'{i+1}: {s}')
