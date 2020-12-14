@@ -1,11 +1,3 @@
-from collections import *
-from functools import lru_cache, reduce
-import heapq
-import itertools
-import math
-import random
-import sys
-import re
 import time
 
 def main():
