@@ -31,11 +31,9 @@ def main():
     # Part 2
     requirements = [(i, int(n)) for i,n in enumerate(routes) if n != 'x']
     requirements.sort(key=lambda x: x[1], reverse=True)
-    print(requirements)
     i = requirements[0]
     a = 0
     success = False
-    best = 0
     while not success:
         for x in range(1, len(requirements)):
             j = requirements[x]
@@ -44,9 +42,6 @@ def main():
                 product = tuple([z[1] for z in requirements[:x]])
                 a += multiply_values(product) // i[1]
                 break
-            if x > best:
-                print(f'Candidate multiple of {a}*{i[1]} matches up to element {x}')
-                best = x
             if x == len(requirements) - 1:
                 success = True
     results.append(a*i[1] - i[0])
