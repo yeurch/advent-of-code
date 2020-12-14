@@ -13,6 +13,11 @@ until you've solved the puzzle for yourself. Where's the fun in that?! But
 do come back and take a look when you've solved them, and feel free to
 [start up a discussion](https://github.com/yeurch/advent-of-code/discussions).
 
+### System Requirements
+
+Running the solutions requires Python *3.9* or later.  This is required for
+(at the very least) the use of the high-precision timer `time.time_ns()`.
+
 ### License
 
 My solutions are licensed under the [MIT license](./LICENSE).
