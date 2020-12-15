@@ -1,16 +1,11 @@
 import time
 
 def evaluate(items, n):
-    last_used = {x: i for i,x in enumerate(items)}
+    last_used = {x: i for i,x in enumerate(items[:-1])}
     next = items[-1]
-    used = set(items[:-1])
     for i in range(len(items)-1, n):
         last = next
-        if last in used:
-            next = i - last_used[last]
-        else:
-            next = 0
-            used.add(last)
+        next = i - last_used[last] if last in last_used else 0
         last_used[last] = i
     return last
 
