@@ -8,35 +8,38 @@ import sys
 import re
 import time
 
-def calc_neighbours(x,y,z, state, expand=True):
+def calc_neighbours(x,y,z,w, state, expand=True, four_d = False):
     new_cells = dict()
     live_neighbours = 0
+    w_range = range(-1, 2) if four_d else [0]
     for dx in range(-1, 2):
         for dy in range(-1, 2):
             for dz in range(-1, 2):
-                if dx == 0 and dy == 0 and dz == 0:
-                    continue # This is ourself
-                posx = x + dx
-                posy = y + dy
-                posz = z + dz
-                if (posx,posy,posz) in state:
-                    if state[posx,posy,posz][0] != '.':
-                        # This is a neigbouring live cube
-                        live_neighbours += 1
-                elif expand:
-                    # Expand space to cover this neigbour for future generations
-                    new_cells[posx,posy,posz] = ['.', calc_neighbours(posx,posy,posz, state, False)[0]]
+                for dw in w_range:
+                    if dx == 0 and dy == 0 and dz == 0 and dw == 0:
+                        continue # This is ourself
+                    posx = x + dx
+                    posy = y + dy
+                    posz = z + dz
+                    posw = w + dw
+                    if (posx,posy,posz,posw) in state:
+                        if state[posx,posy,posz,posw][0] != '.':
+                            # This is a neigbouring live cube
+                            live_neighbours += 1
+                    elif expand:
+                        # Expand space to cover this neigbour for future generations
+                        new_cells[posx,posy,posz,posw] = ['.', calc_neighbours(posx,posy,posz,posw, state, False, four_d)[0]]
     return (live_neighbours, new_cells)
 
-def calc_all_neighbours(state):
+def calc_all_neighbours(state, four_d):
     new = dict()
-    for (x,y,z) in state:
-        (live_neighbours, new_cells) = calc_neighbours(x,y,z, state)
-        state[(x,y,z)][1] = live_neighbours
+    for (x,y,z,w) in state:
+        (live_neighbours, new_cells) = calc_neighbours(x,y,z,w, state, True, four_d)
+        state[(x,y,z,w)][1] = live_neighbours
         for new_cell in new_cells:
             new[new_cell] = new_cells[new_cell]
-    for x in new:
-        state[x] = new[x]
+    for i in new:
+        state[i] = new[i]
 
 def init_state(items):
     rows = len(items)
@@ -44,20 +47,20 @@ def init_state(items):
     state = dict()
     for ny,y in enumerate(items):
         for nx,x in enumerate(y):
-            state[(nx,ny,0)] = [x, 0]
+            state[(nx,ny,0,0)] = [x, 0]
     return state
 
-def do_generation(state):
-    calc_all_neighbours(state)
+def do_generation(state, four_d):
+    calc_all_neighbours(state, four_d)
     for k in state:
         if state[k][0] == '.' and state[k][1] == 3:
             state[k][0] = '#'
         elif state[k][0] == '#' and (state[k][1] < 2 or state[k][1] > 3):
             state[k][0] = '.'
 
-def run_simulation(state, num_generations):
+def run_simulation(state, num_generations, four_d=False):
     for i in range(num_generations):
-        do_generation(state)
+        do_generation(state, four_d)
         live_count = len([1 for s in state if state[s][0] == '#'])
         print(f'After generation {i+1} there are {live_count} live cells')
     return live_count
@@ -69,8 +72,14 @@ def main():
         items = [i.strip() for i in f.read().splitlines()]
 
     # Part 1
+    print('Part 1')
     state = init_state(items)
     results.append(run_simulation(state, 6))
+
+    # Part 2
+    print('Part 2')
+    state = init_state(items)
+    results.append(run_simulation(state, 6, True))
 
     for i,s in enumerate(results):
         print(f'{i+1}: {s}')
