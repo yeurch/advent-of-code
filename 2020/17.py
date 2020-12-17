@@ -26,7 +26,7 @@ def calc_neighbours(x,y,z,w, state, expand=True, four_d = False):
                         if state[posx,posy,posz,posw][0] != '.':
                             # This is a neigbouring live cube
                             live_neighbours += 1
-                    elif expand:
+                    elif expand and state[x,y,z,w][0] == '#':
                         # Expand space to cover this neigbour for future generations
                         new_cells[posx,posy,posz,posw] = ['.', calc_neighbours(posx,posy,posz,posw, state, False, four_d)[0]]
     return (live_neighbours, new_cells)
@@ -38,6 +38,8 @@ def calc_all_neighbours(state, four_d):
         state[(x,y,z,w)][1] = live_neighbours
         for new_cell in new_cells:
             new[new_cell] = new_cells[new_cell]
+
+    # Add all of the cells we're not currently tracking, but are next to an existing cell
     for i in new:
         state[i] = new[i]
 
@@ -52,11 +54,17 @@ def init_state(items):
 
 def do_generation(state, four_d):
     calc_all_neighbours(state, four_d)
+
+    # If any cells are dead, and have no live neighbours, we can remove them from the simulation for efficiency
+    cells_to_remove = [k for k in state if state[k][0] == '.' and state[k][1] < 3]
+    for k in cells_to_remove: del state[k]
+
     for k in state:
         if state[k][0] == '.' and state[k][1] == 3:
             state[k][0] = '#'
         elif state[k][0] == '#' and (state[k][1] < 2 or state[k][1] > 3):
             state[k][0] = '.'
+
 
 def run_simulation(state, num_generations, four_d=False):
     for i in range(num_generations):
