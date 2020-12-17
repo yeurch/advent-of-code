@@ -1,14 +1,6 @@
-from collections import *
-from functools import lru_cache, reduce
-import heapq
-import itertools
-import math
-import random
-import sys
-import re
 import time
 
-def calc_neighbours(x,y,z,w, state, expand=True, four_d = False):
+def calc_neighbours(coordinates, state, expand=True, four_d = False):
     new_cells = dict()
     live_neighbours = 0
     w_range = range(-1, 2) if four_d else [0]
@@ -18,24 +10,21 @@ def calc_neighbours(x,y,z,w, state, expand=True, four_d = False):
                 for dw in w_range:
                     if dx == 0 and dy == 0 and dz == 0 and dw == 0:
                         continue # This is ourself
-                    posx = x + dx
-                    posy = y + dy
-                    posz = z + dz
-                    posw = w + dw
-                    if (posx,posy,posz,posw) in state:
-                        if state[posx,posy,posz,posw][0] != '.':
+                    neighbour_coordinates = (coordinates[0] + dx, coordinates[1] + dy, coordinates[2] + dz, coordinates[3] + dw)
+                    if neighbour_coordinates in state:
+                        if state[neighbour_coordinates][0] != '.':
                             # This is a neigbouring live cube
                             live_neighbours += 1
-                    elif expand and state[x,y,z,w][0] == '#':
+                    elif expand and state[coordinates][0] == '#':
                         # Expand space to cover this neigbour for future generations
-                        new_cells[posx,posy,posz,posw] = ['.', calc_neighbours(posx,posy,posz,posw, state, False, four_d)[0]]
+                        new_cells[neighbour_coordinates] = ['.', calc_neighbours(neighbour_coordinates, state, False, four_d)[0]]
     return (live_neighbours, new_cells)
 
 def calc_all_neighbours(state, four_d):
     new = dict()
-    for (x,y,z,w) in state:
-        (live_neighbours, new_cells) = calc_neighbours(x,y,z,w, state, True, four_d)
-        state[(x,y,z,w)][1] = live_neighbours
+    for k in state:
+        (live_neighbours, new_cells) = calc_neighbours(k, state, True, four_d)
+        state[k][1] = live_neighbours
         for new_cell in new_cells:
             new[new_cell] = new_cells[new_cell]
 
