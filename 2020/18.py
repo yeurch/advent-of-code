@@ -40,13 +40,13 @@ def evaluate(tokens, part):
             expanded.append(t)
         i += 1
 
-    result = 0
-    operator = '+'
     if part == 2:
         while '+' in expanded:
             i = expanded.index('+')
             expanded = expanded[:i-1] + [expanded[i-1] + expanded[i+1]] + expanded[i+2:]
 
+    result = 0
+    operator = '+'
     for t in expanded:
         if isinstance(t, int):
             if operator == '+':
