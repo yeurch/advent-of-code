@@ -1,11 +1,3 @@
-from collections import *
-from functools import lru_cache, reduce
-import heapq
-import itertools
-import math
-import random
-import sys
-import re
 import time
 
 def parse(items):
@@ -35,21 +27,35 @@ def parse(items):
     messages = items[i:]
     return (rules, messages)
 
-def is_match(x, rules, rule_num=0):
-    rule = rules[rule_num]
+def is_match(x, rules, part, ruleid=0, indent=0):
+    rule = rules[ruleid]
+
+    # Special handling for part 2
+    if part == 2 and ruleid == 0:
+        rule = []
+        max_8 = len(x)
+        for i in range(max_8, 0, -1):
+            max_11 = (len(x) - i) // 2
+            for j in range(max_11+1, 0, -1):
+                rule.append([42]*(i+j) + [31]*j)
+
     if isinstance(rule, list):
+        check_all_options = False
         for option in rule:
             consumed = 0
             option_ok = True
+            if 42 in option or 31 in option:
+                check_all_options = True
             for part_rule in option:
-                part_result = is_match(x[consumed:], rules, part_rule)
+                part_result = is_match(x[consumed:], rules, part, part_rule, indent+1)
                 if not part_result[0]:
                     option_ok = False
                     break
                 consumed += part_result[1]
             if option_ok:
-                return (True, consumed)
-        return (False, 0)               
+                if ruleid != 0 or len(x) == consumed:
+                    return (True, consumed)
+        return (False, 0)
     else:
         str_len = len(rule)
         return (True, str_len) if x[:str_len] == rule else (False, 0)
@@ -61,19 +67,14 @@ def main():
         items = [i.strip() for i in f.read().splitlines()]
 
     rules,messages = parse(items)
-    print(rules)
-    print(messages)
 
-    # Part 1
-    passes = 0
-    for msg in messages:
-        m = is_match(msg, rules)
-        msg_passes = m[0] and m[1] == len(msg)
-        print(f'{msg} ... {msg_passes}')
-        if msg_passes: passes += 1
-    results.append(passes)
-    
-
+    for part in range(1, 3):
+        passes = 0
+        for msg in messages:
+            m = is_match(msg, rules, part)
+            msg_passes = m[0] and m[1] == len(msg)
+            if msg_passes: passes += 1
+        results.append(passes)
 
     for i,s in enumerate(results):
         print(f'{i+1}: {s}')
