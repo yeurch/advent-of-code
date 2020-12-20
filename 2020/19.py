@@ -27,7 +27,7 @@ def parse(items):
     messages = items[i:]
     return (rules, messages)
 
-def is_match(x, rules, part, ruleid=0, indent=0):
+def is_match(x, rules, part, ruleid=0):
     rule = rules[ruleid]
 
     # Special handling for part 2
@@ -47,7 +47,7 @@ def is_match(x, rules, part, ruleid=0, indent=0):
             if 42 in option or 31 in option:
                 check_all_options = True
             for part_rule in option:
-                part_result = is_match(x[consumed:], rules, part, part_rule, indent+1)
+                part_result = is_match(x[consumed:], rules, part, part_rule)
                 if not part_result[0]:
                     option_ok = False
                     break
