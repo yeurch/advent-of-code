@@ -11,31 +11,12 @@ class CircularList:
             self.__node_dict[elem] = node
         node.next = self.head
 
-    def __repr__(self):
-        node = self.head
-        nodes = []
-        first = True
-        while node != self.head or first:
-            first = False
-            nodes.append(str(node.value))
-            node = node.next
-        nodes.append('None')
-        return ' -> '.join(nodes)
-    
-    def __iter__(self):
-        node = self.head
-        first = True
-        while node != self.head or First:
-            first = False
-            yield node
-            node = node.next
-
     def advance(self):
         self.head = self.head.next
-    
+
     def get(self, n):
         return self.__node_dict[n]
-    
+
     def get_list(self, a, b):
         node = self.head
         for i in range(b):
@@ -47,9 +28,6 @@ class Node:
     def __init__(self, value):
         self.value = value
         self.next = None
-    
-    def __repr__(self):
-        return str(self.value)
 
 def run_simulation(items, n, part):
     max_item = max(items)
@@ -80,7 +58,7 @@ def run_simulation(items, n, part):
         while node.value != 1:
             result.append(str(node.value))
             node = node.next
-        
+
         return ''.join(result)
     else:
         result = 1
@@ -94,7 +72,7 @@ def main():
 
     with open('23-input.txt', 'r') as f:
         input = [i.strip() for i in f.read()]
-    
+
     items = [int(c) for c in input]
     results.append(run_simulation(items, 100, part=1))
 
