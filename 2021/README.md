@@ -25,7 +25,7 @@ For each day:
 Use noop whenever a part is not yet implemented.
 
 * Create inputs/dayxx.txt and add your puzzle input
-* Run `cargo run <n>` where _n_ is the daya number.
+* Run `cargo run <n>` where _n_ is the day number.
 * Your code will be passed the input and timed automatically.
 
 ### Acknoweldgements
