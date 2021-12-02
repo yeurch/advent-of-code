@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 pub fn part1(input: String) {
-    let commands = input.lines().map(|s| {Command::from_str(s).unwrap()} );
+    let commands = input.lines().map(|s| {s.parse().unwrap()} );
 
     let mut voyage = Voyage::new();
     for c in commands {
@@ -12,7 +12,7 @@ pub fn part1(input: String) {
 }
 
 pub fn part2(input: String) {
-    let commands = input.lines().map(|s| {Command::from_str(s).unwrap()} );
+    let commands = input.lines().map(|s| {s.parse().unwrap()} );
 
     let mut voyage = Voyage::new();
     for c in commands {
