@@ -44,13 +44,14 @@ fn get_o2_or_co2(samples: &Vec<&str>, is_o2: bool) -> u32 {
     let mut filtered_samples = samples.clone();
     for i in 0..bit_width {
         let num_1s = (&filtered_samples).into_iter().filter(|s| {s.as_bytes()[i] as char == '1'}).count();
-        let most_common = if num_1s as f64 >= filtered_samples.len() as f64 / 2.0 {1} else {0};
-        let val_to_retain = char::from_digit(if is_o2 {most_common} else { 1 - most_common}, 10).unwrap();
-        println!("Processing {} samples", filtered_samples.len());
-        if filtered_samples.len() < 10 {
-            for s in &filtered_samples {
-                println!("  {}", s);
-            }
+        let num_0s = filtered_samples.len() - num_1s;
+        let val_to_retain: char;
+        if num_0s == num_1s {
+            val_to_retain = if is_o2 {'1'} else {'0'};
+        }
+        else {
+            let most_common = if num_1s > num_0s {1} else {0};
+            val_to_retain = char::from_digit(if is_o2 {most_common} else { 1 - most_common}, 10).unwrap();
         }
         filtered_samples = filtered_samples.into_iter().filter(|s| {s.as_bytes()[i] as char == val_to_retain}).collect();
         if filtered_samples.len() < 2 { break; }
