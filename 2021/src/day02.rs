@@ -32,7 +32,7 @@ impl FromStr for Command {
     type Err = ();
     fn from_str(input: &str) -> Result<Command, Self::Err> {
         let parts = input.split_whitespace().collect::<Vec<&str>>();
-        let dist: u32 = parts[1].parse().unwrap();
+        let dist = parts[1].parse().unwrap();
         match parts[0] {
             "forward" => Ok(Command::Forward(dist)),
             "down" => Ok(Command::Down(dist)),
