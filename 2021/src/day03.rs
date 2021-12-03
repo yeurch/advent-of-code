@@ -41,9 +41,9 @@ pub fn part2(input: String) {
 fn get_o2_or_co2(samples: &Vec<&str>, is_o2: bool) -> u32 {
     let bit_width = samples[0].len();
 
-    let mut filtered_samples = samples.clone();
+    let mut filtered_samples = (*samples).clone();
     for i in 0..bit_width {
-        let num_1s = (&filtered_samples).into_iter().filter(|s| {s.as_bytes()[i] as char == '1'}).count();
+        let num_1s = filtered_samples.iter().filter(|s| {s.as_bytes()[i] as char == '1'}).count();
         let num_0s = filtered_samples.len() - num_1s;
         let val_to_retain: char;
         if num_0s == num_1s {
