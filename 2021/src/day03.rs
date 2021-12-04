@@ -4,7 +4,7 @@ pub fn part1(input: String) {
 
     let bit_width = samples[0].len();
     let mut counters = vec![0; bit_width];
-    for s in samples {
+    for s in &samples {
         for (i,c) in s.chars().enumerate() {
             if c == '1' {
                 counters[i] += 1;
