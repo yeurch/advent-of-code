@@ -7,11 +7,9 @@ pub fn part2(input: String) {
 }
 
 fn do_impl(input: String, days: u16) {
-    let pop_in: Vec<usize> = input.split(",").map(|s| s.parse().unwrap()).collect();
-
     // Build initial array
     let mut pop = vec![0; 9];
-    for i in pop_in {
+    for i in input.split(",").map(|s| s.parse::<usize>().unwrap()) {
         pop[i] += 1;
     }
 
