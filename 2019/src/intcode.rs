@@ -17,7 +17,7 @@ impl IntCode {
         }
     }
 
-    pub fn get_mem(&self, n: i64) -> &i64 {
+    pub fn get_mem(&self, n: i64) -> i64 {
         self.memory.get(n)
     }
 
@@ -30,28 +30,28 @@ impl IntCode {
     }
 
     pub fn tick(&mut self) -> bool {
-        let opcode = &self.get_mem(self.pc);
-        if **opcode == 1 {
+        let opcode = self.get_mem(self.pc);
+        if opcode == 1 {
             let a1 = &self.get_mem(self.pc + 1);
             let a2 = &self.get_mem(self.pc + 2);
             let a3 = &self.get_mem(self.pc + 3);
-            let v1 = **&self.get_mem(**a1);
-            let v2 = **&self.get_mem(**a2);
+            let v1 = self.get_mem(*a1);
+            let v2 = self.get_mem(*a2);
             let result = v1 + v2;
-            self.set_mem(**a3, result);
+            self.set_mem(*a3, result);
             self.advance_pc(4);
             
         }
-        else if **opcode == 2 {
+        else if opcode == 2 {
             let a1 = &self.get_mem(self.pc + 1);
             let a2 = &self.get_mem(self.pc + 2);
             let a3 = &self.get_mem(self.pc + 3);
-            let v1 = **&self.get_mem(**a1);
-            let v2 = **&self.get_mem(**a2);
-            &self.set_mem(**a3, v1 * v2);
+            let v1 = self.get_mem(*a1);
+            let v2 = self.get_mem(*a2);
+            self.set_mem(*a3, v1 * v2);
             self.advance_pc(4);
         }
-        else if **opcode == 99 {
+        else if opcode == 99 {
             return false;
         }
         true
@@ -69,10 +69,10 @@ impl Memory {
         }
     }
 
-    fn get(&self, n: i64) -> &i64 {
+    fn get(&self, n: i64) -> i64 {
         match self.data.get(&n) {
-            Some(val) => val,
-            None => &0
+            Some(val) => val.clone(),
+            None => 0
         }
     }
 
