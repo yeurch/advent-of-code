@@ -30,8 +30,8 @@ impl IntCode {
     }
 
     pub fn tick(&mut self) -> bool {
-        let instruction = &self.get_mem(self.pc);
-        if **instruction == 1 {
+        let opcode = &self.get_mem(self.pc);
+        if **opcode == 1 {
             let a1 = &self.get_mem(self.pc + 1);
             let a2 = &self.get_mem(self.pc + 2);
             let a3 = &self.get_mem(self.pc + 3);
@@ -42,7 +42,7 @@ impl IntCode {
             self.advance_pc(4);
             
         }
-        else if **instruction == 2 {
+        else if **opcode == 2 {
             let a1 = &self.get_mem(self.pc + 1);
             let a2 = &self.get_mem(self.pc + 2);
             let a3 = &self.get_mem(self.pc + 3);
@@ -51,7 +51,7 @@ impl IntCode {
             &self.set_mem(**a3, v1 * v2);
             self.advance_pc(4);
         }
-        else if **instruction == 99 {
+        else if **opcode == 99 {
             return false;
         }
         true
