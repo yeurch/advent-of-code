@@ -18,7 +18,7 @@ impl IntCode {
     }
 
     pub fn get_mem(&self, n: i64) -> &i64 {
-        self.memory.get(n).unwrap_or(&0)
+        self.memory.get(n)
     }
 
     pub fn set_mem(&mut self, n: i64, val: i64) {
@@ -39,6 +39,7 @@ impl IntCode {
             let v2 = **&self.get_mem(**a2);
             let result = v1 + v2;
             self.set_mem(**a3, result);
+            self.advance_pc(4);
             
         }
         else if **instruction == 2 {
@@ -48,6 +49,7 @@ impl IntCode {
             let v1 = **&self.get_mem(**a1);
             let v2 = **&self.get_mem(**a2);
             &self.set_mem(**a3, v1 * v2);
+            self.advance_pc(4);
         }
         else if **instruction == 99 {
             return false;
@@ -67,11 +69,16 @@ impl Memory {
         }
     }
 
-    fn get(&self, n: i64) -> Option<&i64> {
-        self.data.get(&n)
+    fn get(&self, n: i64) -> &i64 {
+        match self.data.get(&n) {
+            Some(val) => val,
+            None => &0
+        }
     }
 
     fn set(&mut self, n: i64, val: i64) {
-        *self.data.entry(n).or_default() = val;
+        self.data.insert(n, val);
+//        self.data[&n] = val;
+//        *self.data.entry(n).or_default() = val;
     }
 }
