@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 pub fn part1(input: String) {
     let openers: [char; 4] = ['(', '[', '{', '<'];
-    let mappings: HashMap<char, char> = [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')].iter().cloned().collect();
-    let costs: HashMap<char, u32> = [(')',3), (']',57), ('}',1197), ('>',25137)].iter().cloned().collect();
+    let mappings: HashMap<char, char> = [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')].into_iter().collect();
+    let costs: HashMap<char, u32> = [(')',3), (']',57), ('}',1197), ('>',25137)].into_iter().collect();
     
     let mut result = 0;
 
@@ -28,8 +28,8 @@ pub fn part1(input: String) {
 
 pub fn part2(input: String) {
     let openers: [char; 4] = ['(', '[', '{', '<'];
-    let mappings: HashMap<char, char> = [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')].iter().cloned().collect();
-    let scores: HashMap<char, u64> = [(')',1), (']',2), ('}',3), ('>',4)].iter().cloned().collect();
+    let mappings: HashMap<char, char> = [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')].into_iter().collect();
+    let scores: HashMap<char, u64> = [(')',1), (']',2), ('}',3), ('>',4)].into_iter().collect();
     
     let mut completion_scores = vec![];
 
