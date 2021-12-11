@@ -21,10 +21,9 @@ pub fn part2(input: String) {
         result += 1;
     }
 
-    println!("Part 1: {}", result);
+    println!("Part 2: {}", result);
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 struct Point {
     x: usize,
     y: usize
