@@ -14,10 +14,8 @@ pub fn part2(input: String) {
     const RADIX: u32 = 10;
     let mut grid: Vec<Vec<u8>> = input.lines().map(|x| x.chars().map(|c| c.to_digit(RADIX).unwrap() as u8).collect()).collect();
 
-    let mut flashes_this_step = 0;
-    let mut result = 0;
-    while flashes_this_step < 100 {
-        flashes_this_step = do_step(&mut grid);
+    let mut result = 1;
+    while do_step(&mut grid) < 100 {
         result += 1;
     }
 
