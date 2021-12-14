@@ -23,19 +23,18 @@ fn do_impl(input: String, num_rounds: usize) -> u64 {
         *counts.entry(String::from(&polymer[i..=i+1])).or_insert(0) += 1;
     }
 
-    let mut tmp_counts = counts;
     for _ in 0..num_rounds {
         let mut new_counts = HashMap::new();
-        for (k,v) in tmp_counts.iter() {
-            let inserted_char = mappings[&k as &str];
-            *new_counts.entry(k.chars().nth(0).unwrap().to_string() + &inserted_char.to_string()).or_insert(0) += v;
-            *new_counts.entry(inserted_char.to_string() + &k.chars().nth(1).unwrap().to_string()).or_insert(0) += v;
+        for (k,v) in counts.iter() {
+            let inserted_char = mappings[&k as &str].to_string();
+            *new_counts.entry(k.chars().nth(0).unwrap().to_string() + &inserted_char).or_insert(0) += v;
+            *new_counts.entry(inserted_char + &k.chars().nth(1).unwrap().to_string()).or_insert(0) += v;
         }
-        tmp_counts = new_counts;
+        counts = new_counts;
     }
 
     let last = polymer.chars().last().unwrap();
-    calc_result(last, tmp_counts)
+    calc_result(last, counts)
 }
 
 fn calc_result(last: char, counts: HashMap<String, u64>) -> u64 {
