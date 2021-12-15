@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 pub fn part1(input: String) {
     const RADIX: u32 = 10;
     let cell_costs: Grid = input.lines().map(|x| x.chars().map(|c| c.to_digit(RADIX).unwrap() as u16).collect()).collect();
@@ -37,7 +35,6 @@ fn do_impl(cell_costs: Grid) -> u16 {
     let size = cell_costs.len();
 
     let mut grid = cell_costs.clone();
-    let mut to_refresh = HashSet::new();
 
     let mut last = 0;
     set_value(&mut grid, Point{x:0,y:0}, 0);
@@ -47,79 +44,75 @@ fn do_impl(cell_costs: Grid) -> u16 {
         set_value(&mut grid, Point{x,y:0}, last);
     }
     for x in 0..size {
-        last = get_value(&grid, Point{x,y:0});
-        for y in 1..size {
-            let cell_value = get_value(&cell_costs, Point{x,y});
-            last = last + cell_value;
-            if x > 0 && last > get_value(&grid, Point{x:x-1,y}) + cell_value {
-                last = get_value(&grid, Point{x:x-1,y}) + cell_value
-            }
-            if x > 0 {
-                let cell_left = Point{x:x-1,y};
-                if last + get_value(&cell_costs, cell_left) < get_value(&grid, cell_left) {
-                    to_refresh.insert(cell_left);
-                }
-            }
-            set_value(&mut grid, Point{x,y}, last);
-        }
-    }
-
-    // println!("Initial refresh cells count = {}", to_refresh.len());
-
-    while let Some(p) = to_refresh.iter().next().cloned() {
-        to_refresh.remove(&p);
-        refresh(size, &cell_costs, &mut grid, p, &mut to_refresh);
+        let _ = do_column(size, &cell_costs, &mut grid, Point{x,y:1}, true, 0);
     }
 
     get_value(&grid, Point{x:size-1,y:size-1})
 }
 
+fn do_column(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, always_set: bool, init_value: u16) -> Option<usize> {
+    let x = p.x;
+    let mut last = get_value(grid, Point{x,y:p.y-1});
+    if !always_set {
+        set_value(grid, Point{x,y:p.y}, init_value);
+        last = init_value - get_value(cell_costs, Point{x,y:p.y});
+    }
+    for y in p.y..size {
+        let cell_value = get_value(cell_costs, Point{x,y});
+        last = last + cell_value;
+        if x > 0 {
+            if last > get_value(grid, Point{x:x-1,y}) + cell_value {
+                last = get_value(grid, Point{x:x-1,y}) + cell_value
+            }
+            let cell_left = Point{x:x-1,y};
+            if last + get_value(cell_costs, cell_left) < get_value(grid, cell_left) {
+                let do_result = do_column(size, cell_costs, grid, cell_left, false, last + get_value(cell_costs, cell_left));
+                if let Some(row) = do_result {
+                    let _ = do_column(size, cell_costs, grid, Point{x,y:row}, true, 0);
+                }
+            }
+        }
+
+        if always_set || last < get_value(grid, Point{x,y}) {
+            set_value(grid, Point{x,y}, last);
+        }
+        else {
+            break;
+        }
+    }
+
+    if !always_set {
+        last = get_value(grid, Point{x,y:p.y});
+        for y in (0..p.y).rev() {
+            let cell_value = get_value(cell_costs, Point{x,y});
+            last = last + cell_value;
+            if x > 0 {
+                if last > get_value(grid, Point{x:x-1,y}) + cell_value {
+                    last = get_value(grid, Point{x:x-1,y}) + cell_value
+                }
+                let cell_left = Point{x:x-1,y};
+                if last + get_value(cell_costs, cell_left) < get_value(grid, cell_left) {
+                    do_column(size, cell_costs, grid, cell_left, false, last + get_value(cell_costs, cell_left));
+                }
+            }
+
+            if last < get_value(grid, Point{x,y}) {
+                set_value(grid, Point{x,y}, last);
+            }
+            else {
+                return Some(y);
+            }
+        }
+    }
+    None
+}
+
 type Grid = Vec<Vec<u16>>;
 
-#[derive(PartialEq,Eq,Clone,Copy,Hash)]
+#[derive(Clone,Copy)]
 struct Point {
     x: usize,
     y: usize
-}
-
-fn refresh(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, refresh_queue: &mut HashSet<Point>) {
-    let cell_cost = get_value(cell_costs, p) as u32;
-    let mut value = get_value(grid, p) as u32;
-
-    let neighbors = get_neighbors(size, p, grid);
-    let min_neighbor_val = neighbors.iter().map(|n| n.1).min().unwrap() as u32;
-    if min_neighbor_val + cell_cost < value {
-        value = min_neighbor_val + cell_cost;
-        set_value(grid, p, value as u16);
-    }
-    for neighbor in neighbors {
-        if neighbor.1 as u32 > get_value(cell_costs, neighbor.0) as u32 + value as u32 {
-            refresh_queue.insert(neighbor.0);
-        }
-    }
-}
-
-fn get_neighbors(size: usize, p: Point, grid: &Grid) -> Vec<(Point,u16)> {
-    let mut neighbors = vec![];
-    let x = p.x;
-    let y = p.y;
-    if x > 0 {
-        let n = Point{x:x-1,y};
-        neighbors.push((n, get_value(grid, n)));
-    }
-    if x < size - 1 {
-        let n = Point{x:x+1,y};
-        neighbors.push((n, get_value(grid, n)));
-    }
-    if y > 0 {
-        let n = Point{x,y:y-1};
-        neighbors.push((n, get_value(grid, n)));
-    }
-    if y < size - 1 {
-        let n = Point{x,y:y+1};
-        neighbors.push((n, get_value(grid, n)));
-    }
-    neighbors
 }
 
 fn get_value(grid: &Grid, p: Point) -> u16 {
