@@ -44,16 +44,16 @@ fn do_impl(cell_costs: Grid) -> u16 {
         set_value(&mut grid, Point{x,y:0}, last);
     }
     for x in 0..size {
-        let _ = do_column(size, &cell_costs, &mut grid, Point{x,y:1}, true, true, 0);
+        let _ = do_column(size, &cell_costs, &mut grid, Point{x,y:1}, AlwaysSet::All, 0);
     }
 
     get_value(&grid, Point{x:size-1,y:size-1})
 }
 
-fn do_column(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, always_set_first: bool, always_set_all: bool, init_value: u16) -> Option<usize> {
+fn do_column(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, always_set: AlwaysSet, init_value: u16) -> Option<usize> {
     let x = p.x;
     let mut last = get_value(grid, Point{x,y:p.y-1});
-    if !always_set_first {
+    if always_set == AlwaysSet::None {
         set_value(grid, Point{x,y:p.y}, init_value);
         last = init_value - get_value(cell_costs, Point{x,y:p.y});
     }
@@ -68,14 +68,14 @@ fn do_column(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, always_s
             }
             let cell_left = Point{x:x-1,y};
             if last + get_value(cell_costs, cell_left) < get_value(grid, cell_left) {
-                let do_result = do_column(size, cell_costs, grid, cell_left, false, false, last + get_value(cell_costs, cell_left));
+                let do_result = do_column(size, cell_costs, grid, cell_left, AlwaysSet::None, last + get_value(cell_costs, cell_left));
                 if let Some(row) = do_result {
-                    let _ = do_column(size, cell_costs, grid, Point{x,y:row}, true, false, 0);
+                    let _ = do_column(size, cell_costs, grid, Point{x,y:row}, AlwaysSet::First, 0);
                 }
             }
         }
 
-        if always_set_all || (always_set_first && first_iteration) || last < get_value(grid, Point{x,y}) {
+        if always_set == AlwaysSet::All || (first_iteration && always_set == AlwaysSet::First) || last < get_value(grid, Point{x,y}) {
             set_value(grid, Point{x,y}, last);
             first_iteration = false;
         }
@@ -84,7 +84,7 @@ fn do_column(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, always_s
         }
     }
 
-    if !always_set_first {
+    if always_set == AlwaysSet::None {
         last = get_value(grid, Point{x,y:p.y});
         for y in (0..p.y).rev() {
             let cell_value = get_value(cell_costs, Point{x,y});
@@ -95,7 +95,7 @@ fn do_column(size: usize, cell_costs: &Grid, grid: &mut Grid, p: Point, always_s
                 }
                 let cell_left = Point{x:x-1,y};
                 if last + get_value(cell_costs, cell_left) < get_value(grid, cell_left) {
-                    do_column(size, cell_costs, grid, cell_left, false, false, last + get_value(cell_costs, cell_left));
+                    do_column(size, cell_costs, grid, cell_left, AlwaysSet::None, last + get_value(cell_costs, cell_left));
                 }
             }
 
@@ -116,6 +116,13 @@ type Grid = Vec<Vec<u16>>;
 struct Point {
     x: usize,
     y: usize
+}
+
+#[derive(PartialEq)]
+enum AlwaysSet {
+    None,
+    First,
+    All
 }
 
 fn get_value(grid: &Grid, p: Point) -> u16 {
