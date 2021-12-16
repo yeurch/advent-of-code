@@ -15,7 +15,7 @@ pub fn part2(input: String) {
 fn total_versions(packet: &Packet) ->u64 {
     let mut result = packet.version;
     for child in &packet.children {
-        result += total_versions(&child);
+        result += total_versions(child);
     }
     result
 }
