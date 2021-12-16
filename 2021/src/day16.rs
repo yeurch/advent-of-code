@@ -9,7 +9,7 @@ pub fn part1(input: String) {
 pub fn part2(input: String) {
     let mut streamer = DataStreamer::new(input);
     let packet = Packet::read(&mut streamer);
-    println!("Part 1: {}", packet.value);
+    println!("Part 2: {}", packet.value);
 }
 
 fn total_versions(packet: &Packet) ->u64 {
