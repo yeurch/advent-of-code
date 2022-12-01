@@ -12,7 +12,8 @@ do come back and take a look when you've solved them, and feel free to
 
 * [2019](./2019/README.md) - Rust (backfilling in progress, older Python solutions for days 1&2 are in the `python/` subfolder)
 * [2020](./2020/README.md) - Python (completed!)
-* [2021](./2021/README.md) - Rust (in progress)
+* [2021](./2021/README.md) - Rust (incomplete)
+* [2022](./2022/README.md) - Go (in progress)
 
 ### License
 
