@@ -13,7 +13,7 @@ import (
 var inputDay string
 
 func Part1(input string) int {
-	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	lines := strings.Split(input, "\n")
 
 	result := 0
 	thisElf := 0
