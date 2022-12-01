@@ -32,7 +32,7 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	lines := strings.Split(input, "\n")
 
 	var elves []int
 	thisElf := 0
