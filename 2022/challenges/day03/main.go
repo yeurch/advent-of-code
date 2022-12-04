@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/deckarep/golang-set"
+	"github.com/deckarep/golang-set/v2"
 	"strings"
 	"time"
 )
@@ -39,19 +39,15 @@ func Part2(input string) int {
 		if common.Cardinality() != 1 {
 			panic("Unexpected number of items in intersction")
 		}
-		commonByte := common.Pop().(byte)
+		commonByte, _ := common.Pop()
 		result += getPriority(rune(commonByte))
 
 	}
 	return result
 }
 
-func toCharSet(s string) mapset.Set {
-	a := make([]interface{}, len(s))
-	for i := range s {
-		a[i] = s[i]
-	}
-	return mapset.NewSetFromSlice(a)
+func toCharSet(s string) mapset.Set[byte] {
+	return mapset.NewThreadUnsafeSet[byte]([]byte(s)...)
 }
 
 func getPriority(c rune) int {
