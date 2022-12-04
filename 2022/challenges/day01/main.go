@@ -62,10 +62,10 @@ func main() {
 	fmt.Println("*** Advent of Code 2022, day 01 ***")
 
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(inputDay)))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(inputDay)))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }
