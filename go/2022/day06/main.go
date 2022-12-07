@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/yeurch/advent-of-code/2022/ysl"
+	"github.com/yeurch/advent-of-code/go/ysl"
 	"time"
 )
 
