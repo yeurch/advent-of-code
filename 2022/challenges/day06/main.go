@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/yeurch/advent-of-code/2022/yeurlib"
+	"github.com/yeurch/advent-of-code/2022/ysl"
 	"time"
 )
 
@@ -32,7 +32,7 @@ func detectUnique(input string, uniqueLen int) int {
 }
 
 func isUnique(slice []byte) bool {
-	s := yeurlib.NewSet[byte]()
+	s := ysl.NewSet[byte]()
 	for _, c := range slice {
 		s.Add(c)
 	}

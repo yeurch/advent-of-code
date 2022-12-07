@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/deckarep/golang-set/v2"
+	"github.com/yeurch/advent-of-code/2022/ysl"
 	"strings"
 	"time"
 )
@@ -46,8 +46,8 @@ func Part2(input string) int {
 	return result
 }
 
-func toCharSet(s string) mapset.Set[byte] {
-	return mapset.NewThreadUnsafeSet[byte]([]byte(s)...)
+func toCharSet(s string) ysl.Set[byte] {
+	return ysl.NewSet[byte]([]byte(s)...)
 }
 
 func getPriority(c rune) int {
