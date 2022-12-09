@@ -59,15 +59,16 @@ func doMove(segments []pos, dxHead int, dyHead int) {
 		tailToHeadX := segments[i-1].x - segments[i].x
 		tailToHeadY := segments[i-1].y - segments[i].y
 
-		if ysl.Abs(tailToHeadX) > 1 || ysl.Abs(tailToHeadY) > 1 {
-			if tailToHeadX != 0 {
-				segments[i].x += tailToHeadX / ysl.Abs(tailToHeadX)
-			}
-			if tailToHeadY != 0 {
-				segments[i].y += tailToHeadY / ysl.Abs(tailToHeadY)
-			}
-		} else {
+		if ysl.Abs(tailToHeadX) <= 1 && ysl.Abs(tailToHeadY) <= 1 {
+			// No need for any further moves
 			break
+		}
+
+		if tailToHeadX != 0 {
+			segments[i].x += tailToHeadX / ysl.Abs(tailToHeadX)
+		}
+		if tailToHeadY != 0 {
+			segments[i].y += tailToHeadY / ysl.Abs(tailToHeadY)
 		}
 	}
 }
