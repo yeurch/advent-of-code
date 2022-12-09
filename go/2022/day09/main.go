@@ -66,6 +66,8 @@ func doMove(segments []pos, dxHead int, dyHead int) {
 			if tailToHeadY != 0 {
 				segments[i].y += tailToHeadY / ysl.Abs(tailToHeadY)
 			}
+		} else {
+			break
 		}
 	}
 }
