@@ -22,10 +22,15 @@ type monkey struct {
 	inspectionCount int
 }
 
-func newMonkey(items []int, op []string, divisor, trueTarget, falseTarget int) monkey {
+func newMonkey(items []int, allDivisors []int, op []string, divisor, trueTarget, falseTarget int) monkey {
 	l := list.New()
 	for _, i := range items {
 		l.PushBack(i)
+		m := make(map[int]int)
+		for _, d := range allDivisors {
+			m[d] = i % d
+		}
+		l.PushBack(m)
 	}
 	return monkey{l, op, divisor, trueTarget, falseTarget, 0}
 }
@@ -33,17 +38,26 @@ func newMonkey(items []int, op []string, divisor, trueTarget, falseTarget int) m
 func (m *monkey) do(allMonkeys []monkey, part2 bool) {
 	for el := m.items.Front(); el != nil; el = el.Next() {
 		val := el.Value.(int)
-		val = m.op(val)
-		if !part2 {
-			val = val / 3
-		}
-		var target int
-		if val%m.divisor == 0 {
-			target = m.trueTarget
+		el = el.Next()
+		divisorMap := el.Value.(map[int]int)
+
+		target := m.falseTarget
+		if part2 {
+			for k, v := range divisorMap {
+				newVal := m.op(v)
+				divisorMap[k] = newVal % k
+			}
+			if divisorMap[m.divisor] == 0 {
+				target = m.trueTarget
+			}
 		} else {
-			target = m.falseTarget
+			val = m.op(val) / 3
+			if val%m.divisor == 0 {
+				target = m.trueTarget
+			}
 		}
-		allMonkeys[target].giveItem(val)
+
+		allMonkeys[target].giveItem(val, divisorMap)
 		m.inspectionCount++
 	}
 	m.items = list.New()
@@ -71,11 +85,12 @@ func (m *monkey) op(val int) int {
 	}
 }
 
-func (m *monkey) giveItem(item int) {
+func (m *monkey) giveItem(item int, divisorMap map[int]int) {
 	m.items.PushBack(item)
+	m.items.PushBack(divisorMap)
 }
 
-func Part1(input string) int {
+func Part1(input string) int64 {
 	allMonkeys := parseMonkeys(input)
 
 	for roundNum := 0; roundNum < 20; roundNum++ {
@@ -85,22 +100,43 @@ func Part1(input string) int {
 		}
 	}
 
+	return calcMonkeyBusiness(allMonkeys)
+}
+
+func Part2(input string) int64 {
+	allMonkeys := parseMonkeys(input)
+
+	for roundNum := 0; roundNum < 10000; roundNum++ {
+		for i := range allMonkeys {
+			monkey := &allMonkeys[i]
+			monkey.do(allMonkeys, true)
+		}
+	}
+
+	return calcMonkeyBusiness(allMonkeys)
+}
+
+func calcMonkeyBusiness(allMonkeys []monkey) int64 {
 	n := len(allMonkeys)
 	inspectionCounts := make([]int, n)
 	for i, m := range allMonkeys {
 		inspectionCounts[i] = m.inspectionCount
 	}
 	sort.Ints(inspectionCounts)
-	return inspectionCounts[n-1] * inspectionCounts[n-2]
-}
-
-func Part2(input string) int {
-	return 0
+	return int64(inspectionCounts[n-1]) * int64(inspectionCounts[n-2])
 }
 
 func parseMonkeys(input string) []monkey {
 	lines := strings.Split(input, "\n")
 	n := len(lines) / 7
+
+	// First we'll get all of the divisors, we'll need each monkey to track them all
+	allDivisors := make([]int, n)
+	for i := 0; i < n; i++ {
+		divisorLine := i*7 + 3
+		divisor, _ := strconv.Atoi(lines[divisorLine][21:])
+		allDivisors[i] = divisor
+	}
 
 	monkeys := make([]monkey, n)
 	for i := 0; i < n; i++ {
@@ -118,7 +154,7 @@ func parseMonkeys(input string) []monkey {
 		trueTarget, _ := strconv.Atoi(lines[start+4][29:])
 		falseTarget, _ := strconv.Atoi(lines[start+5][30:])
 
-		monkeys[i] = newMonkey(items, ops, divisor, trueTarget, falseTarget)
+		monkeys[i] = newMonkey(items, allDivisors, ops, divisor, trueTarget, falseTarget)
 	}
 	return monkeys
 }
