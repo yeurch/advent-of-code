@@ -67,12 +67,7 @@ func (node *Node) toString() string {
 	for i, c := range node.Children {
 		children[i] = c.toString()
 	}
-	return fmt.Sprintf("[%s]", strings.Join(children, ", "))
-}
-
-type pair struct {
-	first  *Node
-	second *Node
+	return fmt.Sprintf("[%s]", strings.Join(children, ","))
 }
 
 // The following type and associated three functions implement the sort.Interface so we can sort our nodes in part 2
@@ -91,10 +86,10 @@ func (nc nodeCollection) Swap(i, j int) {
 }
 
 func Part1(input string) int {
-	pairs := parseInput(input)
+	nodes := parseInput(input)
 	result := 0
-	for i, v := range pairs {
-		if v.first.Compare(v.second) < 1 {
+	for i := 0; i < len(nodes)/2; i++ {
+		if nodes[i*2].Compare(nodes[i*2+1]) < 1 {
 			result += i + 1
 		}
 	}
@@ -102,13 +97,8 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	pairs := parseInput(input)
-	// unwrap the pairs0
-	nodes := make([]*Node, len(pairs)*2)
-	for i, v := range pairs {
-		nodes[i*2] = v.first
-		nodes[i*2+1] = v.second
-	}
+	nodes := parseInput(input)
+
 	// append our divider packets
 	divider1 := parseNode("[[2]]")
 	divider2 := parseNode("[[6]]")
@@ -127,15 +117,16 @@ func Part2(input string) int {
 	return result
 }
 
-func parseInput(input string) []pair {
+func parseInput(input string) []*Node {
 	lines := strings.Split(input, "\n")
-	numPairs := len(lines) / 3
-	result := make([]pair, numPairs)
-	for i := 0; i < numPairs; i++ {
-		firstLine := i * 3
-		result[i] = pair{
-			parseNode(lines[firstLine]),
-			parseNode(lines[firstLine+1]),
+	result := make([]*Node, 0)
+	for _, line := range lines {
+		if len(line) > 0 {
+			node := parseNode(line)
+			if line != node.toString() {
+				panic("Parse error")
+			}
+			result = append(result, node)
 		}
 	}
 	return result
