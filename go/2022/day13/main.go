@@ -29,9 +29,6 @@ type Node struct {
 }
 
 func (node *Node) Compare(other *Node) int {
-	if node == nil || other == nil {
-		panic("Can't compare nil nodes")
-	}
 	if node.Value.Valid && other.Value.Valid {
 		return ysl.Compare(node.Value.Value, other.Value.Value)
 	} else if node.Value.Valid && !other.Value.Valid {
@@ -57,17 +54,6 @@ func (node *Node) Compare(other *Node) int {
 		}
 	}
 	return ysl.Sgn(len(node.Children) - len(other.Children))
-}
-
-func (node *Node) toString() string {
-	if node.Value.Valid {
-		return fmt.Sprintf("%d", node.Value.Value)
-	}
-	children := make([]string, len(node.Children))
-	for i, c := range node.Children {
-		children[i] = c.toString()
-	}
-	return fmt.Sprintf("[%s]", strings.Join(children, ","))
 }
 
 // The following type and associated three functions implement the sort.Interface so we can sort our nodes in part 2
@@ -122,11 +108,7 @@ func parseInput(input string) []*Node {
 	result := make([]*Node, 0)
 	for _, line := range lines {
 		if len(line) > 0 {
-			node := parseNode(line)
-			if line != node.toString() {
-				panic("Parse error")
-			}
-			result = append(result, node)
+			result = append(result, parseNode(line))
 		}
 	}
 	return result
@@ -140,8 +122,6 @@ func parseNode(input string) *Node {
 	if v, err := strconv.Atoi(input); err == nil {
 		// This is just a numeric node
 		result.Value.Set(v)
-	} else if input[0] != '[' || input[len(input)-1] != ']' {
-		panic("Input can't be parsed: " + input)
 	} else {
 		s := input[1 : len(input)-1] // strip wrapping pair of []
 		children := make([]*Node, 0)
@@ -160,15 +140,11 @@ func parseNode(input string) *Node {
 
 func findNodeLen(input string) int {
 	if input[0] != '[' {
-		// Could be a number, followed by either , or ]
+		// This is a number, optionally followed by either , or ]
 		endPos := strings.IndexAny(input, ",]")
 		s := input
 		if endPos >= 0 {
 			s = s[:endPos]
-		}
-		_, err := strconv.Atoi(s)
-		if err != nil {
-			panic("Input doesn't start with [ and isn't a number: " + input)
 		}
 		return len(s)
 	}
