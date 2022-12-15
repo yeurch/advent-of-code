@@ -61,15 +61,29 @@ func Part1(input string) int {
 	}
 
 	const y = 2000000
-	result := 0
-	for x := minX; x <= maxX; x++ {
-		p := point{x, y}
-		for _, s := range sensors {
-			if s.loc.ManhattanDistance(p) <= s.ManhattanDistance() && p != s.nearestBeacon {
-				result++
-				break
+	const numGoroutines = 10
+	resultChan := make(chan int)
+	for i := 0; i < numGoroutines; i++ {
+		go func(goroutineNum int) {
+			min, max := getPartition(goroutineNum, numGoroutines, minX, maxX+1)
+			n := 0
+			for x := min; x < max; x++ {
+				//for x := range partition(goroutineNum, numGoroutines, minX, maxX+1) {
+				p := point{x, y}
+				for _, s := range sensors {
+					if s.loc.ManhattanDistance(p) <= s.ManhattanDistance() && p != s.nearestBeacon {
+						n++
+						break
+					}
+				}
 			}
-		}
+			resultChan <- n
+		}(i)
+	}
+
+	result := 0
+	for i := 0; i < numGoroutines; i++ {
+		result += <-resultChan
 	}
 	return result
 }
@@ -78,26 +92,54 @@ func Part2(input string) int64 {
 	sensors := parseInput(input)
 
 	const maxCoord = 4000000
+	const numGoroutines = 10
+	resultChan := make(chan int64)
 
-	for y := 0; y <= maxCoord; y++ {
-		for x := 0; x <= maxCoord; x++ {
-			p := point{x, y}
-			bFound := true
-			for _, s := range sensors {
-				if s.loc.ManhattanDistance(p) <= s.ManhattanDistance() {
-					maxXForThisSensor := s.ManhattanDistance() - ysl.Abs(y-s.loc.y) + s.loc.x
-					x = maxXForThisSensor // Jump to the end of where this sensor blocks
-					bFound = false
-					break
+	for i := 0; i < numGoroutines; i++ {
+		go func(goroutineNum int) {
+			yMin, yMax := getPartition(goroutineNum, numGoroutines, 0, maxCoord+1)
+			for y := yMin; y < yMax; y++ {
+				for x := 0; x <= maxCoord; x++ {
+					p := point{x, y}
+					bFound := true
+					for _, s := range sensors {
+						if s.loc.ManhattanDistance(p) <= s.ManhattanDistance() {
+							maxXForThisSensor := s.ManhattanDistance() - ysl.Abs(y-s.loc.y) + s.loc.x
+							x = maxXForThisSensor // Jump to the end of where this sensor blocks
+							bFound = false
+							break
+						}
+					}
+					if bFound {
+						resultChan <- int64(p.x)*int64(maxCoord) + int64(p.y)
+						return
+					}
 				}
 			}
-			if bFound {
-				return int64(p.x)*int64(maxCoord) + int64(p.y)
-			}
-		}
+		}(i)
 	}
 
-	panic("Could not find a suitable point for beacon")
+	return <-resultChan
+}
+
+// Returns min (inclusive) and max (exclusive) bounds for the given partition.
+// Similarly, the arguments start and end (which define the total space to partition)
+// are inclusive and exclusive respectively.
+func getPartition(partitionNum, numPartitions, start, end int) (int, int) {
+	totalItems := end - start
+	itemsPerPartition := totalItems / numPartitions
+	extra := totalItems % numPartitions
+
+	offset := extra + start
+	if partitionNum < extra {
+		offset = partitionNum + start
+	}
+	min := partitionNum*itemsPerPartition + offset
+	max := (partitionNum+1)*itemsPerPartition + offset
+	if partitionNum < extra {
+		max++
+	}
+	return min, max
 }
 
 func parseInput(input string) []sensor {
