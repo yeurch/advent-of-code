@@ -2,6 +2,7 @@ package ysl
 
 type Set[T comparable] interface {
 	Cardinality() int
+	Contains(item T) bool
 	Add(item T) bool
 	Pop() (T, bool)
 	Intersect(other Set[T]) Set[T]
@@ -23,6 +24,11 @@ func newSet[T comparable]() set[T] {
 
 func (s *set[T]) Cardinality() int {
 	return len(*s)
+}
+
+func (s *set[T]) Contains(v T) bool {
+	_, ok := (*s)[v]
+	return ok
 }
 
 func (s *set[T]) Add(item T) bool {
@@ -48,21 +54,16 @@ func (s *set[T]) Intersect(other Set[T]) Set[T] {
 	// loop over smaller set
 	if s.Cardinality() < other.Cardinality() {
 		for el := range *s {
-			if o.contains(el) {
+			if o.Contains(el) {
 				intersection.Add(el)
 			}
 		}
 	} else {
 		for elem := range *o {
-			if s.contains(elem) {
+			if s.Contains(elem) {
 				intersection.Add(elem)
 			}
 		}
 	}
 	return &intersection
-}
-
-func (s *set[T]) contains(v T) bool {
-	_, ok := (*s)[v]
-	return ok
 }
