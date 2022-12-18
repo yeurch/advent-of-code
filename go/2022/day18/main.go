@@ -82,38 +82,9 @@ func Part2(input string) int {
 	maxY++
 	maxZ++
 
-	// Populate our initial water queue as all locations one outside the max bounds of our shape
+	// Populate our initial water queue with any location one outside the max bounds of our shape
 	waterQueue := list.New()
-	for y := minY; y <= maxY; y++ {
-		for z := minZ; z <= maxZ; z++ {
-			points := []point{{minX, y, z}, {maxX, y, z}}
-			for _, p := range points {
-				if !cubes.Contains(p) {
-					waterQueue.PushBack(p)
-				}
-			}
-		}
-	}
-	for x := minX + 1; x <= maxX-1; x++ {
-		for z := minZ; z <= maxZ; z++ {
-			points := []point{{x, minY, z}, {x, maxY, z}}
-			for _, p := range points {
-				if !cubes.Contains(p) {
-					waterQueue.PushBack(p)
-				}
-			}
-		}
-	}
-	for x := minX + 1; x <= maxX-1; x++ {
-		for y := minY + 1; y <= maxY-1; y++ {
-			points := []point{{x, y, minZ}, {x, y, maxZ}}
-			for _, p := range points {
-				if !cubes.Contains(p) {
-					waterQueue.PushBack(p)
-				}
-			}
-		}
-	}
+	waterQueue.PushBack(point{minX, minY, minZ})
 
 	cardinalDirections := []point{
 		{1, 0, 0}, {-1, 0, 0},
