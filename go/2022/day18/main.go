@@ -95,10 +95,8 @@ func Part2(input string) int {
 	result := 0
 	waterVisited := ysl.NewSet[point]()
 
-	for waterQueue.Len() > 0 {
-		el := waterQueue.Front()
+	for el := waterQueue.Front(); el != nil; el = el.Next() {
 		current := el.Value.(point)
-		waterQueue.Remove(el)
 		if waterVisited.Contains(current) {
 			continue
 		}
