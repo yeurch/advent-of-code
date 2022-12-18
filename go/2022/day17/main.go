@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +18,11 @@ type point struct {
 
 type shape []point
 
+type towerStatus struct {
+	brickNum    int
+	towerHeight int
+}
+
 func (p point) add(other point) point {
 	return point{p.x + other.x, p.y + other.y}
 }
@@ -33,9 +37,32 @@ func (s *shape) height() int {
 	return result + 1
 }
 
-func Part1(input string) int {
+type tower struct {
+	cycleRocks  int
+	cycleHeight int
+	heights     []int
+}
+
+func (t *tower) HeightAfterRock(n int64) int64 {
+	if n <= 0 {
+		return 0
+	}
+	rocksRemaining := n - int64(len(t.heights))
+	if rocksRemaining < 0 {
+		return int64(t.heights[n-1])
+	}
+	cyclesToSkip := rocksRemaining/int64(t.cycleRocks) + 1
+	result := cyclesToSkip * int64(t.cycleHeight)
+	index := n - cyclesToSkip*int64(t.cycleRocks) - 1
+	result += int64(t.heights[index])
+	return result
+}
+
+func newTower(input string) *tower {
 	input = strings.TrimSuffix(input, "\n")
 	inputLen := len(input)
+
+	var result tower
 
 	shapes := []shape{
 		{{0, 0}, {1, 0}, {2, 0}, {3, 0}},         // horizontal line,
@@ -45,68 +72,6 @@ func Part1(input string) int {
 		{{0, 0}, {0, 1}, {1, 0}, {1, 1}},         // square block
 	}
 	numShapes := len(shapes)
-
-	grid := make([][]bool, 0)
-	turn := 0
-	rockTowerHeight := 0
-
-	for rockNum := 0; rockNum < 2022; rockNum++ {
-		rock := shapes[rockNum%numShapes]
-
-		// add rows to top of grid as required
-		newGridHeight := rockTowerHeight + 3 + rock.height()
-		for i := len(grid); i < newGridHeight; i++ {
-			grid = append(grid, make([]bool, 7))
-		}
-
-		shapePos := point{2, rockTowerHeight + 3} // bottom left of shape
-		bRockComplete := false
-		for !bRockComplete {
-			windDir := input[turn%inputLen]
-			lateralMove := point{1, 0}
-			if windDir == '<' {
-				lateralMove.x = -1
-			}
-			desiredLoc := shapePos.add(lateralMove)
-			if canPlace(&grid, rock, desiredLoc) {
-				shapePos = desiredLoc
-			}
-
-			desiredLoc = shapePos.add(point{0, -1}) // drop by one
-			if canPlace(&grid, rock, desiredLoc) {
-				shapePos = desiredLoc
-			} else {
-				bRockComplete = true
-				place(&grid, rock, shapePos)
-				topOfShape := shapePos.y + rock.height()
-				if topOfShape > rockTowerHeight {
-					rockTowerHeight = topOfShape
-				}
-			}
-			turn++
-		}
-	}
-	return rockTowerHeight
-}
-
-type towerStatus struct {
-	brickNum    int
-	towerHeight int
-}
-
-func Part2(input string) int64 {
-	input = strings.TrimSuffix(input, "\n")
-	inputLen := len(input)
-
-	shapes := []shape{
-		{{0, 0}, {1, 0}, {2, 0}, {3, 0}},         // horizontal line,
-		{{1, 0}, {0, 1}, {1, 1}, {2, 1}, {1, 2}}, // plus
-		{{2, 2}, {2, 1}, {2, 0}, {1, 0}, {0, 0}}, // reverse L
-		{{0, 0}, {0, 1}, {0, 2}, {0, 3}},         // vertical line
-		{{0, 0}, {0, 1}, {1, 0}, {1, 1}},         // square block
-	}
-	numShapes := len(shapes)
-
 	grid := make([][]bool, 0)
 	turn := 0
 	rockTowerHeight := 0
@@ -114,18 +79,12 @@ func Part2(input string) int64 {
 	fingerprints := make(map[string]towerStatus)
 	cycleSize := 0
 	candidateCycleConsecutiveOccurrences := 0
-	bCycleSizeFound := false
-	var heightSkipped int64
 
 	rockNum := 0
-	for count := math.MaxInt; count >= 0; count-- {
+	for {
 		rockIndex := rockNum % numShapes
 		rock := shapes[rockIndex]
 		var turnIndex int
-
-		if rockNum == 2022 {
-			fmt.Printf("Completed part 1 equivalent ... %d\n", rockTowerHeight)
-		}
 
 		// add rows to top of grid as required
 		newGridHeight := rockTowerHeight + 3 + rock.height()
@@ -158,43 +117,36 @@ func Part2(input string) int64 {
 				if topOfShape > rockTowerHeight {
 					rockTowerHeight = topOfShape
 				}
+				result.heights = append(result.heights, rockTowerHeight)
 			}
 			turn++
 		}
 
-		if !bCycleSizeFound {
-			fp := fingerprint(&grid, rockTowerHeight, rockIndex, turnIndex)
-			existingStatus, ok := fingerprints[fp]
-			if ok {
-				candidateCycleSize := rockNum - existingStatus.brickNum
-				if cycleSize == candidateCycleSize {
-					candidateCycleConsecutiveOccurrences++
-				} else {
-					cycleSize = candidateCycleSize
-					candidateCycleConsecutiveOccurrences = 0
-				}
-
-				if candidateCycleConsecutiveOccurrences > candidateCycleSize {
-					heightDelta := rockTowerHeight - existingStatus.towerHeight
-					fmt.Printf("Found a cycle: %d --> %d = %d (occurred %d times). Delta height = %d\n",
-						existingStatus.brickNum, rockNum, candidateCycleSize,
-						candidateCycleConsecutiveOccurrences, heightDelta)
-
-					rocksRemaining := 1000000000000 - int64(rockNum)
-					cyclesToSkip := rocksRemaining / int64(candidateCycleSize)
-					heightSkipped = cyclesToSkip * int64(heightDelta)
-					count = int(rocksRemaining-(cyclesToSkip*int64(candidateCycleSize))) - 1
-
-					bCycleSizeFound = true
-				}
-
+		fp := fingerprint(&grid, rockTowerHeight, rockIndex, turnIndex)
+		existingStatus, ok := fingerprints[fp]
+		if ok {
+			candidateCycleSize := rockNum - existingStatus.brickNum
+			if cycleSize == candidateCycleSize {
+				candidateCycleConsecutiveOccurrences++
+			} else {
+				cycleSize = candidateCycleSize
+				candidateCycleConsecutiveOccurrences = 0
 			}
-			fingerprints[fp] = towerStatus{rockNum, rockTowerHeight}
+
+			if candidateCycleConsecutiveOccurrences > candidateCycleSize {
+				result.cycleHeight = rockTowerHeight - existingStatus.towerHeight
+				result.cycleRocks = candidateCycleSize
+				fmt.Printf("Found a cycle: %d --> %d = %d (occurred %d times). Delta height = %d\n",
+					existingStatus.brickNum, rockNum, candidateCycleSize,
+					candidateCycleConsecutiveOccurrences, result.cycleHeight)
+
+				return &result
+			}
+
 		}
+		fingerprints[fp] = towerStatus{rockNum, rockTowerHeight}
 		rockNum++
 	}
-
-	return int64(rockTowerHeight) + heightSkipped
 }
 
 func fingerprint(grid *[][]bool, maxHeight int, rockIndex int, turnIndex int) string {
@@ -235,8 +187,18 @@ func place(grid *[][]bool, s shape, pos point) {
 	}
 }
 
+func Part1(input string) int64 {
+	tower := newTower(input)
+	return tower.HeightAfterRock(2022)
+}
+
+func Part2(input string) int64 {
+	tower := newTower(input)
+	return tower.HeightAfterRock(1000000000000)
+}
+
 func main() {
-	fmt.Println("*** Advent of Code 2022, day nn ***")
+	fmt.Println("*** Advent of Code 2022, day 17 ***")
 
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
