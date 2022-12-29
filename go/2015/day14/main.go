@@ -90,7 +90,7 @@ func parseInput(input string) []reindeer {
 }
 
 func main() {
-	fmt.Println("*** Advent of Code 2022, day nn ***")
+	fmt.Println("*** Advent of Code 2015, day 14 ***")
 
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))

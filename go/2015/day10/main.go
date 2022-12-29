@@ -105,7 +105,7 @@ func parseInput(input string) map[string]element {
 func main() {
 	inputDay := "1321131112"
 
-	fmt.Println("*** Advent of Code 2022, day 10 ***")
+	fmt.Println("*** Advent of Code 2015, day 10 ***")
 
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))

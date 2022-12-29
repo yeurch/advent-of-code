@@ -227,7 +227,7 @@ func dumpDistances(distances *map[string]*map[string]int) {
 }
 
 func main() {
-	fmt.Println("*** Advent of Code 2022, day nn ***")
+	fmt.Println("*** Advent of Code 2022, day 16 ***")
 
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
