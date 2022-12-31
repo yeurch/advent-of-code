@@ -4,6 +4,7 @@ type Set[T comparable] interface {
 	Cardinality() int
 	Contains(item T) bool
 	Add(item T) bool
+	Remove(item T) bool
 	Pop() (T, bool)
 	Intersect(other Set[T]) Set[T]
 }
@@ -36,6 +37,14 @@ func (s *set[T]) Add(item T) bool {
 		return false
 	}
 	(*s)[item] = struct{}{}
+	return true
+}
+
+func (s *set[T]) Remove(item T) bool {
+	if _, ok := (*s)[item]; !ok {
+		return false
+	}
+	delete(*s, item)
 	return true
 }
 
