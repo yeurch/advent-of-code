@@ -2,3 +2,6 @@ template.py
 /downloads/
 target/
 .idea/
+__pycache__/
+.venv/
+venv/
