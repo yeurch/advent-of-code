@@ -8,14 +8,12 @@ def cmp(a, b):
     return (a > b) - (a < b)
 
 def is_safe(report):
-    errors_made = 0
     direction = cmp(report[1], report[0])
     if direction == 0:
         return False
 
-    should_abort = False
     for idx in range(1, len(report)):
-        delta = report[idx] - report[idx - errors_made - 1]
+        delta = report[idx] - report[idx - 1]
         if cmp(delta, 0) != direction or abs(delta) < 1 or abs(delta) > 3:
             return False
     return True
