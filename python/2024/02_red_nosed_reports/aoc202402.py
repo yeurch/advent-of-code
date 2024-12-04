@@ -1,11 +1,11 @@
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 import pathlib
-import sys
+from aoc_common.math import cmp
 
 def parse_data(puzzle_input):
     return [tuple([int(number) for number in line.split()]) for line in puzzle_input.split('\n')]
-
-def cmp(a, b):
-    return (a > b) - (a < b)
 
 def is_safe(report):
     direction = cmp(report[1], report[0])

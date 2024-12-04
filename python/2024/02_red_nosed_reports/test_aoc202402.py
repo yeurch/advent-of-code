@@ -35,12 +35,3 @@ def test_part1_example1(example1):
 def test_part2_example1(example1):
     """Test part 2 on example input."""
     assert aoc202402.part2(example1) == 4
-
-def test_cmp_big_first():
-    assert aoc202402.cmp(4, 6) == -1
-
-def test_cmp_same():
-    assert aoc202402.cmp(42, 42) == 0
-
-def test_cmp_small_first():
-    assert aoc202402.cmp(6, 3) == 1
