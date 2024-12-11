@@ -50,3 +50,6 @@ def test_count(grid):
     assert grid.count(5) == 0
     assert grid.count(1) == 1
     assert grid.count(9) == 2
+
+def test_neighbours(grid):
+    assert grid.get_neighbour_locations(1,0) == [(2,0),(1,1),(0,0)]

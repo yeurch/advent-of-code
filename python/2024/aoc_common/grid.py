@@ -8,12 +8,10 @@ class AOCGrid():
         return AOCGrid([list(row) for row in data.strip().split('\n')])
 
     def get_cell(self, x, y):
-        if x >= self.width or y >= self.height or x < 0 or y < 0:
-            return None
-        return self.__data[y][x]
+        return self.__data[y][x] if self.is_in_bounds(x, y) else None
 
     def set_cell(self, x, y, val):
-        if x >= self.width or y >= self.height or x < 0 or y < 0:
+        if not self.is_in_bounds(x, y):
             raise ValueError("Provided inputs were out of bounds")
         self.__data[y][x] = val
 
@@ -31,6 +29,14 @@ class AOCGrid():
                 if self.get_cell(x, y) == c:
                     result.append((x, y))
         return result
+
+    def is_in_bounds(self, x, y):
+        return x>=0 and y>=0 and x<self.width and y<self.height
+
+    def get_neighbour_locations(self, x, y):
+        possible_deltas = [(0,-1),(1,0),(0,1),(-1,0)]
+        possible_positions = [(x+d[0], y+d[1]) for d in possible_deltas]
+        return [p for p in possible_positions if self.is_in_bounds(p[0],p[1])]
 
     def count(self, c):
         return len(self.find_all(c))
